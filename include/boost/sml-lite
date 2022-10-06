@@ -11,13 +11,31 @@
 // Benchmarks
 //    perf stat $CXX -std=c++20 -x c++ sml-lite -DBENCH
 //
+// Features
+// sm
+//   dependencies
+//   process_event(Event)
+//   is(state...)
+//
+// dsl
+//   transition_table
+//     initial state
+//     termiante state
+//     orthogonal regions
+//   dispatch_table
+// guards/actions
+//   compund guards, seq actions
+//   constexpr guards
+// events
+//   unexpected event
+// actions
+//   process
+//   
 // Example
 //  https://godbolt.org/z/v98acEbb6
 //
 // [] support for &fn without lambda
 //  [ &type::guard ]  / &type::action
-//
-// [] sm should be copyable/movable
 //
 // [] support for logger
 //
