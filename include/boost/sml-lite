@@ -144,8 +144,6 @@ export
   }  // namespace mp
 
   namespace back {
-  struct self {};
-
   template <class... Ts>
   struct pool : Ts... {
     constexpr explicit(true) pool(Ts... ts) : Ts{ts}... {}
@@ -251,8 +249,8 @@ export
       return fn(event, args...);
     } else if constexpr (requires { fn(event); }) {
       return fn(event);
-    } else if constexpr (requires { fn(back::self{}, self); }) {
-      return fn(back::self{}, self);
+    } else if constexpr (requires { fn(self, event, args...); }) {
+      return fn(self, event, args...);
     } else {
       return fn();
     }
@@ -328,19 +326,19 @@ export
   }
 
   [[nodiscard]] constexpr auto operator,(const concepts::invocable auto& lhs, const concepts::invocable auto& rhs) {
-    return [=](const auto& event, auto&&... args) {
-      invoke(lhs, event, args...);
-      invoke(rhs, event, args...);
+    return [=](auto& self, const auto& event, auto&&... args) {
+      invoke(lhs, event, self, args...);
+      invoke(rhs, event, self, args...);
     };
   }
   [[nodiscard]] constexpr auto operator and(const concepts::invocable auto& lhs, const concepts::invocable auto& rhs) {
-    return [=](const auto& event, auto&&... args) { return invoke(lhs, event, args...) and invoke(rhs, event, args...); };
+    return [=](auto& self, const auto& event, auto&&... args) { return invoke(lhs, event, self, args...) and invoke(rhs, event, self, args...); };
   }
   [[nodiscard]] constexpr auto operator or(const concepts::invocable auto& lhs, const concepts::invocable auto& rhs) {
-    return [=](const auto& event, auto&&... args) { return invoke(lhs, event, args...) or invoke(rhs, event, args...); };
+    return [=](auto& self, const auto& event, auto&&... args) { return invoke(lhs, event, self, args...) or invoke(rhs, event, self, args...); };
   }
   [[nodiscard]] constexpr auto operator not(const concepts::invocable auto& t) {
-    return [=](const auto& event, auto&&... args) { return not invoke(t, event, args...); };
+    return [=](auto& self, const auto& event, auto&&... args) { return not invoke(t, event, self, args...); };
   }
   }  // namespace front
 
@@ -369,7 +367,7 @@ export
   using front::operator or;
   constexpr auto otherwise = [] { return true; };
   constexpr auto X = "X"_s;
-  constexpr auto process = [](const auto& event) { return [event](back::self, auto& self) { self.process_event(event); }; };
+  constexpr auto process = [](const auto& event) { return [event](auto& self, const auto&, auto&&...) { self.process_event(event); }; };
   }  // namespace dsl
 }  // namespace boost::sml::inlinev_2_0_0
 
