@@ -17,9 +17,6 @@
 // [] support for &fn without lambda
 //  [ &type::guard ]  / &type::action
 //
-// [] support for process
-//  process(event{})
-//
 // [] sm should be copyable/movable
 //
 // [] support for logger
@@ -147,14 +144,14 @@ export
   }  // namespace mp
 
   namespace back {
+  struct self {};
 
   template <class... Ts>
   struct pool : Ts... {
     constexpr explicit(true) pool(Ts... ts) : Ts{ts}... {}
   };
 
-  template <class...>
-  struct transitions {};
+  template <class...> struct transitions {};
 
   template <class TEvent, class T, auto Counter>
   constexpr auto insert() -> void {
@@ -171,8 +168,7 @@ export
     (insert<TEvents(TUnique), T, mp::counter<TEvents(TUnique)>>(), ...);
   }
 
-  template <class...>
-  class sm;
+  template <class...> class sm;
   template <template <class...> class TList, class... Transitions, class TUnique>
   class sm<TList<Transitions...>, TUnique> {
     static_assert(((transition<TUnique, Transitions>(typename Transitions::event{}), ...), true));
@@ -208,7 +204,7 @@ export
     template <class TEvent, class T>
     constexpr auto process_event0(const TEvent& event, transitions<T>, auto&&... args) -> bool {
       unsigned arg{};
-      return static_cast<T&>(transition_table_)(event, arg, args...);
+      return static_cast<T&>(transition_table_)(event, arg, *this, args...);
     }
 
     template <class TEvent, class... Ts>
@@ -218,7 +214,7 @@ export
 
     template <class TEvent, class T>
     constexpr auto process_event1(const TEvent& event, auto& current_state, transitions<T>, auto&&... args) -> bool {
-      return T::src.hash == current_state and static_cast<T&>(transition_table_)(event, current_state, args...);
+      return T::src.hash == current_state and static_cast<T&>(transition_table_)(event, current_state, *this, args...);
     }
 
     template <class TEvent, class... Ts>
@@ -250,11 +246,13 @@ export
   };
   }  // namespace concepts
 
-  [[nodiscard]] constexpr auto invoke(const auto& fn, const auto& event, auto&&... args) {
+  [[nodiscard]] constexpr auto invoke(const auto& fn, const auto& event, auto& self, auto&&... args) {
     if constexpr (requires { fn(event, args...); }) {
       return fn(event, args...);
     } else if constexpr (requires { fn(event); }) {
       return fn(event);
+    } else if constexpr (requires { fn(back::self{}, self); }) {
+      return fn(back::self{}, self);
     } else {
       return fn();
     }
@@ -296,22 +294,22 @@ export
       return transition<src, TEvent, TGuard, TAction, T::src>{.guard = guard, .action = action};
     }
 
-    [[nodiscard]] auto operator()(const auto& event, [[maybe_unused]] auto& current_state, auto&&... args) -> bool {
-      using R = decltype(invoke(guard, event, args...));
+    [[nodiscard]] auto operator()(const auto& event, [[maybe_unused]] auto& current_state, auto& self, auto&&... args) -> bool {
+      using R = decltype(invoke(guard, event, self, args...));
       if constexpr (requires { R::value; }) {
         if constexpr (R::value) {
-          invoke(action, event, args...);
           if constexpr (dst.size) {
             current_state = dst.hash;
           }
+          invoke(action, event, self, args...);
           return true;
         }
       } else {
-        if (invoke(guard, event, args...)) {
-          invoke(action, event, args...);
+        if (invoke(guard, event, self, args...)) {
           if constexpr (dst.size) {
             current_state = dst.hash;
           }
+          invoke(action, event, self, args...);
           return true;
         }
       }
@@ -324,27 +322,25 @@ export
 
   template <class... TEvents>
   constexpr auto event = transition<"", mp::list<TEvents...>>{};
-  template <template<class...> class TList, class... TEvents>
-  constexpr auto event<TList<TEvents...>> = transition<"", mp::list<TEvents...>>{};
   template <mp::fixed_string Str>
   constexpr auto operator""_s() {
     return transition<Str>{};
   }
 
   [[nodiscard]] constexpr auto operator,(const concepts::invocable auto& lhs, const concepts::invocable auto& rhs) {
-    return [=](const auto& event) {
-      invoke(lhs, event);
-      invoke(rhs, event);
+    return [=](const auto& event, auto&&... args) {
+      invoke(lhs, event, args...);
+      invoke(rhs, event, args...);
     };
   }
   [[nodiscard]] constexpr auto operator and(const concepts::invocable auto& lhs, const concepts::invocable auto& rhs) {
-    return [=](const auto& event) { return invoke(lhs, event) and invoke(rhs, event); };
+    return [=](const auto& event, auto&&... args) { return invoke(lhs, event, args...) and invoke(rhs, event, args...); };
   }
   [[nodiscard]] constexpr auto operator or(const concepts::invocable auto& lhs, const concepts::invocable auto& rhs) {
-    return [=](const auto& event) { return invoke(lhs, event) or invoke(rhs, event); };
+    return [=](const auto& event, auto&&... args) { return invoke(lhs, event, args...) or invoke(rhs, event, args...); };
   }
   [[nodiscard]] constexpr auto operator not(const concepts::invocable auto& t) {
-    return [=](const auto& event) { return not invoke(t, event); };
+    return [=](const auto& event, auto&&... args) { return not invoke(t, event, args...); };
   }
   }  // namespace front
 
@@ -373,6 +369,7 @@ export
   using front::operator or;
   constexpr auto otherwise = [] { return true; };
   constexpr auto X = "X"_s;
+  constexpr auto process = [](const auto& event) { return [event](back::self, auto& self) { self.process_event(event); }; };
   }  // namespace dsl
 }  // namespace boost::sml::inlinev_2_0_0
 
@@ -442,7 +439,6 @@ int main() {
       using namespace dsl;
       return transition_table{
           *"s1"_s + event<e1, e2> = "s2"_s,
-          "s2"_s + event<mp::list<e1, e2>> = "s3"_s,
       };
     };
 
@@ -454,9 +450,6 @@ int main() {
 
       expect(sm.process_event(e1{}));
       expect(sm.is("s2"_s));
-
-      // expect(sm.process_event(e1{}));
-      // expect(sm.is("s3"_s));
     }
 
     {
@@ -465,9 +458,6 @@ int main() {
 
       expect(sm.process_event(e2{}));
       expect(sm.is("s2"_s));
-
-      // expect(sm.process_event(e2{}));
-      // expect(sm.is("s3"_s));
     }
   };
 
@@ -571,6 +561,20 @@ int main() {
 
     expect(not sm.process_event(e2{}));
     expect(42_u == value);
+  };
+
+  "process"_test = [] {
+    sm sm = [] {
+      using namespace dsl;
+      return transition_table{
+        *"s1"_s + event<e1> / process(e2{}) = "s2"_s,
+         "s2"_s + event<e2> = "s3"_s,
+      };
+    };
+
+    using namespace dsl;
+    expect(sm.process_event(e1{}));
+    expect(sm.is("s3"_s));
   };
 
   "dispatch_table"_test = [] {
