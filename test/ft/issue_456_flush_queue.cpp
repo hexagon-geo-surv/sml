@@ -1,5 +1,6 @@
 // cppcheck-suppress missingIncludeSystem
 #include <boost/sml.hpp>
+// cppcheck-suppress missingIncludeSystem
 #include <queue>
 
 namespace sml = boost::sml;
