@@ -132,4 +132,9 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/issue_622_any_state_nested.cpp)
   add_test(test_issue_622_any_state_nested test_issue_622_any_state_nested)
 endif()
 
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/issue_456_flush_queue.cpp)
+  add_executable(test_issue_456_flush_queue issue_456_flush_queue.cpp)
+  add_test(test_issue_456_flush_queue test_issue_456_flush_queue)
+endif()
+
 add_subdirectory(errors)

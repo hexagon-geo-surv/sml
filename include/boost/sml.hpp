@@ -2011,6 +2011,15 @@ struct sm_impl : aux::conditional_t<aux::should_not_subclass_statemachine_class<
     } while (process_queued_events(d, subs, queued_handled, aux::type_wrapper<process_queue_t<TEvent>>{}, events_t{}));
     return handled && queued_handled;
   }
+  template <class TDeps, class TSubs>
+  constexpr void flush_queue(TDeps &d, TSubs &subs) {
+    const auto lock = thread_safety_.create_lock();
+    (void)lock;
+    bool queued_handled = true;
+    do {
+      while (process_internal_events(anonymous{}, d, subs)) {}
+    } while (process_queued_events(d, subs, queued_handled, aux::type_wrapper<process_t>{}, events_t{}));
+  }
   constexpr void initialize(const aux::type_list<> &) {}
   template <class TState>
   constexpr void initialize(const aux::type_list<TState> &) {
@@ -2366,6 +2375,9 @@ class sm {
   template <class TEvent, BOOST_SML_DETAIL_REQUIRES(!aux::is_base_of<TEvent, events_ids>::value)>
   constexpr bool process_event(const TEvent &event) {
     return aux::get<sm_impl<Tsm>>(sub_sms_).process_event(unexpected_event<_, TEvent>{event}, deps_, sub_sms_);
+  }
+  constexpr void flush_queue() {
+    aux::get<sm_impl<Tsm>>(sub_sms_).flush_queue(deps_, sub_sms_);
   }
   template <class T = aux::identity<sm_t>, class TVisitor, BOOST_SML_DETAIL_REQUIRES(concepts::callable<void, TVisitor>::value)>
   constexpr void visit_current_states(const TVisitor &visitor) const {
