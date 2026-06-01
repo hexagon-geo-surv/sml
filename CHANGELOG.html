@@ -157,10 +157,100 @@
           <div role="main">
             <div class="section">
               
-                <h2 id="116-2022-09-07"><a href="https://github.com/boost-ext/sml/compare/v1.1.5...v1.1.6">1.1.6</a> - 2022-09-07</h2>
+                <h2 id="120-2026-06-01">[1.2.0] - 2026-06-01</h2>
+<ul>
+<li>
+<p><strong>Additions</strong></p>
+<ul>
+<li><code>sm::flush_queue()</code> — drain pending queued events from async handlers (#456)</li>
+<li><code>sml::clear_defer</code> action — discard deferred events from a transition (#643)</li>
+<li><code>sml::deps&lt;Ts...&gt;</code> policy — explicit pool dependencies for generic-lambda actions/guards (#437)</li>
+<li><code>sml::make_action&lt;Deps...&gt;(f)</code> — wrap a template/generic/constrained callable so its dependency and event types are deduced from the explicit <code>&lt;Deps...&gt;</code> list (#629)</li>
+</ul>
+</li>
+<li>
+<p><strong>Behavior changes</strong></p>
+<ul>
+<li>Empty-SM min-size trick is now OFF by default on GCC/Clang (it was UB at <code>-O2</code>);
+  opt back in with <code>BOOST_SML_CFG_ENABLE_MIN_SIZE</code>. <code>sizeof(sm)</code> for an empty SM may change (#249)</li>
+<li><code>any</code>/<code>_</code> wildcard no longer fires when a composable sub-SM has terminated (#622)</li>
+<li>Events raised via <code>process(E{})</code> are now storable in the process queue (#580)</li>
+<li>Guard taking <code>const State&amp;</code> now sees live pool state instead of a stale copy (#530)</li>
+<li>Sub-SM defer queue is cleared when its composite state is re-entered (#253)</li>
+</ul>
+</li>
+<li>
+<p><strong>Bug Fixes</strong></p>
+<ul>
+<li>Template-depth, <code>-Wshadow</code>, <code>-Wextra-semi</code>, UBSan, final-class, null-deref,
+  double-pop, reserved-identifier and related fixes — see full list:</li>
+<li>https://github.com/boost-ext/sml/compare/v1.1.13...v1.2.0</li>
+</ul>
+</li>
+<li>
+<p><strong>Documented limitations</strong></p>
+<ul>
+<li><code>on_entry&lt;_&gt;</code> multi-TU linker limitation and dispatch priority (#565)</li>
+<li><code>operator,</code> with two raw member-function-pointer actions; <code>wrap()</code> workaround (#389)</li>
+</ul>
+</li>
+</ul>
+<h2 id="1113-2025-12-01">[1.1.13] - 2025-12-01</h2>
+<ul>
+<li>Changes<ul>
+<li>https://github.com/boost-ext/sml/compare/v1.1.12...v1.1.13</li>
+</ul>
+</li>
+</ul>
+<h2 id="1112-2025-04-02">[1.1.12] - 2025-04-02</h2>
+<ul>
+<li>Changes<ul>
+<li>https://github.com/boost-ext/sml/compare/v1.1.11...v1.1.12</li>
+</ul>
+</li>
+</ul>
+<h2 id="1111-2024-03-09">[1.1.11] - 2024-03-09</h2>
+<ul>
+<li>
+<p><strong>Bug Fixes</strong></p>
+<ul>
+<li>MSVC typename</li>
+</ul>
+</li>
+<li>
+<p><strong>Additions</strong></p>
+<ul>
+<li>[performance] switch as defult dispatch_policy</li>
+</ul>
+</li>
+</ul>
+<h2 id="1110-2024-03-09">[1.1.10] - 2024-03-09</h2>
+<ul>
+<li>
+<p><strong>Bug Fixes</strong></p>
+<ul>
+<li><a href="https://github.com/boost-ext/sml/issues?utf8=%E2%9C%93&amp;q=is%3Aissue+is%3Aclosed+closed%3A2023-09-13..2024-03-09+">Issues</a></li>
+</ul>
+</li>
+<li>
+<p><strong>Contributions</strong></p>
+<ul>
+<li><a href="https://github.com/boost-ext/sml/commits?author=devzeb">Sebastian Michel</a></li>
+<li><a href="https://github.com/rvdvvdw">rvdvvdw</a></li>
+<li><a href="https://github.com/uyha">Beartama</a></li>
+<li><a href="https://github.com/michaelcorreia-adt">michaelcorreia-adt</a></li>
+<li><a href="https://github.com/J-Meyers">Julian Meyers</a></li>
+<li><a href="https://github.com/marcobergamin">Marco Bergamin</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="119-2023-09-13">[1.1.9] - 2023-09-13</h2>
+<pre><code>- [Issues](https://github.com/boost-ext/sml/issues?utf8=%E2%9C%93&amp;q=is%3Aissue+is%3Aclosed+closed%3A2022-09-07..2023-09-13+)
+</code></pre>
+<h2 id="116-2022-09-07"><a href="https://github.com/boost-ext/sml/compare/v1.1.5...v1.1.6">1.1.6</a> - 2022-09-07</h2>
 <ul>
 <li><strong>Bug Fixes</strong><ul>
-<li><a href="https://github.com/boost-ext/sml/issues?utf8=%E2%9C%93&amp;q=is%3Aissue+is%3Aclosed+closed%3A2022-03-23..2020-09-07+">Issues</a><blockquote></blockquote>
+<li><a href="https://github.com/boost-ext/sml/issues?utf8=%E2%9C%93&amp;q=is%3Aissue+is%3Aclosed+closed%3A2022-03-23..2022-09-07+">Issues</a><blockquote></blockquote>
 </li>
 </ul>
 </li>
@@ -341,7 +431,7 @@
     
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a> | Powered by <a href="http://melpon.org/wandbox">Wandbox</a>
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a> | Powered by <a href="https://wandbox.org">Wandbox</a>
 </footer>
 	  
         </div>

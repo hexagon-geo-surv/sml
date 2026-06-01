@@ -161,52 +161,46 @@
 <ul>
 <li>Get <a href="https://raw.githubusercontent.com/boost-ext/sml/master/include/boost/sml.hpp">boost/sml.hpp</a> header</li>
 </ul>
-<pre><code class="sh">wget https://raw.githubusercontent.com/boost-ext/sml/master/include/boost/sml.hpp
+<pre><code class="language-sh">wget https://raw.githubusercontent.com/boost-ext/sml/master/include/boost/sml.hpp
 </code></pre>
-
 <ul>
 <li>Include the header and define <code>sml</code> namespace alias</li>
 </ul>
-<pre><code class="cpp">#include &quot;boost/sml.hpp&quot;
+<pre><code class="language-cpp">#include &quot;boost/sml.hpp&quot;
 namespace sml = boost::sml;
 </code></pre>
-
 <ul>
 <li>Compile with C++14 support</li>
 </ul>
-<pre><code class="sh">$CXX -std=c++14 ... | cl /std:c++14 ...
+<pre><code class="language-sh">$CXX -std=c++14 ... | cl /std:c++14 ...
 </code></pre>
-
 <ul>
 <li>To run tests</li>
 </ul>
-<pre><code class="sh">git clone https://github.com/boost-ext/sml &amp;&amp; cd sml &amp;&amp; make test
+<pre><code class="language-sh">git clone https://github.com/boost-ext/sml &amp;&amp; cd sml &amp;&amp; make test
 </code></pre>
-
 <h3 id="dependencies">Dependencies</h3>
 <ul>
 <li>No external dependencies are required (neither STL nor Boost)</li>
 </ul>
 <h3 id="supportedtested-compilers">Supported/Tested compilers</h3>
 <ul>
-<li><a href="https://travis-ci.org/boost-ext/sml">Clang-3.4+</a></li>
-<li><a href="https://travis-ci.org/boost-ext/sml">GCC-5.2+</a></li>
-<li><a href="https://ci.appveyor.com/project/krzysztof-jusiak/sml">MSVC-2015</a><ul>
+<li><a href="https://github.com/boost-ext/sml/actions/workflows/build_matrix.yml">Clang-3.4+</a></li>
+<li><a href="https://github.com/boost-ext/sml/actions/workflows/build_matrix.yml">GCC-5.2+</a></li>
+<li><a href="https://github.com/boost-ext/sml/actions/workflows/build_matrix.yml">MSVC-2015+</a><ul>
 <li>Known limitations</li>
 </ul>
 </li>
 </ul>
-<pre><code class="cpp">  &quot;src_state&quot;_s + event&lt;e&gt; = &quot;dst_state&quot;_s                                // Error on MSVC-2015, Ok on GCC-5+, Clang-3.4+
+<pre><code class="language-cpp">  &quot;src_state&quot;_s + event&lt;e&gt; = &quot;dst_state&quot;_s                                // Error on MSVC-2015, Ok on GCC-5+, Clang-3.4+
   state&lt;class src_state&gt; + event&lt;e&gt; = state&lt;class dst_state&gt;              // Ok on all supported compilers
 </code></pre>
-
-<pre><code class="cpp">  const auto guard1 = [] { return true; }
+<pre><code class="language-cpp">  const auto guard1 = [] { return true; }
   state&lt;class a&gt; + event&lt;e&gt; [ guard1 ] / [](const auto&amp; event) {}          // Error on MSVC-2015, Ok on GCC-5+, Clang-3.4+
 
   const auto guard2 = [] -&gt; bool { return true; }
   state&lt;class a&gt; + event&lt;e&gt; [ guard2 ] / [](const auto&amp; event) -&gt; void {}  // Ok on all supported compilers
 </code></pre>
-
 <h3 id="configuration">Configuration</h3>
 <table>
 <thead>
@@ -218,10 +212,33 @@ namespace sml = boost::sml;
 <tbody>
 <tr>
 <td><code>BOOST_SML_VERSION</code></td>
-<td>Current version of [Boost].SML (ex. 1'0'0)</td>
+<td>Current version of [Boost].SML (ex. 1'1'13)</td>
+</tr>
+<tr>
+<td><code>BOOST_SML_CFG_ENABLE_MIN_SIZE</code></td>
+<td>Opt in to the empty-SM size trick (zero-size array); disabled by default, see note below</td>
+</tr>
+<tr>
+<td><code>BOOST_SML_CFG_DISABLE_MIN_SIZE</code></td>
+<td>Legacy name kept for backward compatibility; the min-size trick is now disabled by default</td>
+</tr>
+<tr>
+<td><code>BOOST_SML_DISABLE_EXCEPTIONS</code></td>
+<td>Build with exceptions disabled (e.g. with <code>-fno-exceptions</code>)</td>
+</tr>
+<tr>
+<td><code>BOOST_SML_CREATE_DEFAULT_CONSTRUCTIBLE_DEPS</code></td>
+<td>Allow default-constructing dependencies owned by the State Machine</td>
 </tr>
 </tbody>
 </table>
+<blockquote>
+<p><strong>Note (min-size):</strong> Since the changes after <code>v1.1.13</code>, the empty-State-Machine
+size optimization is <strong>off by default</strong> on GCC/Clang because the zero-length-array
+trick triggered undefined behavior at <code>-O2</code> (UBSan violations). As a result,
+<code>sizeof(sm&lt;...&gt;)</code> for an empty State Machine may differ from earlier releases.
+Define <code>BOOST_SML_CFG_ENABLE_MIN_SIZE</code> to opt back in.</p>
+</blockquote>
 <h3 id="exception-safety">Exception Safety</h3>
 <ul>
 <li>[Boost].SML doesn't use exceptions internally and therefore might be compiled with <code>-fno-exceptions</code>.</li>
@@ -234,10 +251,9 @@ namespace sml = boost::sml;
 <li>[Boost].SML is not thread safe by default.</li>
 <li>Thread Safety might be enabled by defining a thread_safe policy when creating a State Machine. Lock type has to be provided.</li>
 </ul>
-<pre><code class="cpp">sml::sm&lt;example, sml::thread_safe&lt;std::recursive_mutex&gt;&gt; sm;
+<pre><code class="language-cpp">sml::sm&lt;example, sml::thread_safe&lt;std::recursive_mutex&gt;&gt; sm;
 sm.process_event(event{}); // thread safe call
 </code></pre>
-
 <ul>
 <li>See <a href="user_guide.html#policies">Thread Safe Policy</a></li>
 </ul>
@@ -263,13 +279,17 @@ sm.process_event(event{}); // thread safe call
 </table>
 <h3 id="error-messages">Error messages</h3>
 <p><strong><em>Not configurable</em></strong>
-<img alt="CPP" src="https://raw.githubusercontent.com/boost-ext/sml/master/test/ft/errors/not_configurable.cpp" /></p>
+<img alt="CPP" src="https://raw.githubusercontent.com/boost-ext/sml/master/test/ft/errors/not_configurable.cpp" />
+<a href="https://godbolt.org/z/zehzezMoe">▶ See the compile error on Compiler Explorer</a></p>
 <p><strong><em>Not callable</em></strong>
-<img alt="CPP" src="https://raw.githubusercontent.com/boost-ext/sml/master/test/ft/errors/not_callable.cpp" /></p>
+<img alt="CPP" src="https://raw.githubusercontent.com/boost-ext/sml/master/test/ft/errors/not_callable.cpp" />
+<a href="https://godbolt.org/z/fb8K6q4WK">▶ See the compile error on Compiler Explorer</a></p>
 <p><strong><em>Not transitional</em></strong>
-<img alt="CPP" src="https://raw.githubusercontent.com/boost-ext/sml/master/test/ft/errors/not_transitional.cpp" /></p>
+<img alt="CPP" src="https://raw.githubusercontent.com/boost-ext/sml/master/test/ft/errors/not_transitional.cpp" />
+<a href="https://godbolt.org/z/3aWdcTanT">▶ See the compile error on Compiler Explorer</a></p>
 <p><strong><em>Not dispatchable</em></strong>
-<img alt="CPP" src="https://raw.githubusercontent.com/boost-ext/sml/master/test/ft/errors/not_dispatchable.cpp" /></p>
+<img alt="CPP" src="https://raw.githubusercontent.com/boost-ext/sml/master/test/ft/errors/not_dispatchable.cpp" />
+<a href="https://godbolt.org/z/984KoaP6x">▶ See the compile error on Compiler Explorer</a></p>
               
             </div>
           </div>
@@ -303,7 +323,7 @@ sm.process_event(event{}); // thread safe call
     
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a> | Powered by <a href="http://melpon.org/wandbox">Wandbox</a>
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a> | Powered by <a href="https://wandbox.org">Wandbox</a>
 </footer>
 	  
         </div>

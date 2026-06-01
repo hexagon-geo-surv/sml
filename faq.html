@@ -157,7 +157,26 @@
           <div role="main">
             <div class="section">
               
-                
+                <h1 id="faq">FAQ</h1>
+<h2 id="limitations">Limitations</h2>
+<h3 id="on_entry_-across-translation-units"><code>on_entry&lt;_&gt;</code> across translation units</h3>
+<p>When <code>on_entry&lt;_&gt;</code> (the wildcard entry handler) is defined in one translation unit
+while the <code>initial</code>-event specialization is left undefined, the linker reports an
+undefined reference. Make sure the entry handler is fully defined where it is used.</p>
+<p>Dispatch priority: a specific <code>on_entry&lt;e1&gt;</code> handler takes priority over the
+<code>on_entry&lt;_&gt;</code> wildcard. The wildcard fires only when no specific handler matches the
+event used to enter the state.</p>
+<pre><code class="language-cpp">// on_entry&lt;e1&gt; fires when entering via e1 (specific handler wins)
+// on_entry&lt;_&gt;  fires when entering via any other event (no specific handler)
+</code></pre>
+<h3 id="operator-with-two-raw-member-function-pointer-actions"><code>operator,</code> with two raw member-function-pointer actions</h3>
+<p>Two raw member-function-pointer actions combined with the comma operator
+(<code>&amp;A::f, &amp;A::g</code>) select the built-in comma operator, because both operands are
+class types — so SML's action-sequencing is bypassed. Wrap the actions with
+<code>wrap(...)</code> to restore sequencing:</p>
+<pre><code class="language-cpp">*&quot;s1&quot;_s + event&lt;e&gt; / (wrap(&amp;A::f), wrap(&amp;A::g)) = X
+</code></pre>
+<p>See <code>example/actions_guards.cpp</code> for a worked example.</p>
               
             </div>
           </div>
@@ -191,7 +210,7 @@
     
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a> | Powered by <a href="http://melpon.org/wandbox">Wandbox</a>
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a> | Powered by <a href="https://wandbox.org">Wandbox</a>
 </footer>
 	  
         </div>
