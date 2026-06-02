@@ -200,11 +200,8 @@ auto state  = &quot;idle&quot;_s;
 <p>States are printable too.</p>
 <pre><code class="language-cpp">assert(string(&quot;idle&quot;) == &quot;idle&quot;_s.c_str());
 </code></pre>
-<p><img alt="CPP(BTN)" src="Run_Events_Example|https://raw.githubusercontent.com/boost-ext/sml/master/example/events.cpp" />
-<a href="https://godbolt.org/z/s816cG5j8">▶ Run on Compiler Explorer</a>
-<img alt="CPP(BTN)" src="Run_States_Example|https://raw.githubusercontent.com/boost-ext/sml/master/example/states.cpp" />
+<p><a href="https://godbolt.org/z/s816cG5j8">▶ Run on Compiler Explorer</a>
 <a href="https://godbolt.org/z/c9asGjYTr">▶ Run on Compiler Explorer</a>
-<img alt="CPP(BTN)" src="Run_Composite_Example|https://raw.githubusercontent.com/boost-ext/sml/master/example/composite.cpp" />
 <a href="https://godbolt.org/z/5sYb9eGbe">▶ Run on Compiler Explorer</a></p>
 <p>&nbsp;</p>
 <hr />
@@ -244,8 +241,7 @@ explicitly:</p>
 <pre><code class="language-cpp">struct Counter { int n = 0; };
 auto inc = sml::make_action&lt;Counter&amp;&gt;([](auto&amp; c) { c.n++; }); // generic lambda -&gt; Counter&amp;
 </code></pre>
-<p><img alt="CPP(BTN)" src="Run_Actions_Guards_Example|https://raw.githubusercontent.com/boost-ext/sml/master/example/actions_guards.cpp" />
-<a href="https://godbolt.org/z/nehrdofPx">▶ Run on Compiler Explorer</a></p>
+<p><a href="https://godbolt.org/z/nehrdofPx">▶ Run on Compiler Explorer</a></p>
 <p>&nbsp;</p>
 <hr />
 <h3 id="3-create-a-transition-table">3. Create a transition table</h3>
@@ -357,9 +353,7 @@ make_transition_table(
 , X             &lt;= &quot;dst_state&quot;_s  + &quot;other_event&quot;_e
 );
 </code></pre>
-<p><img alt="CPP(BTN)" src="Run_Transition_Table_Example|https://raw.githubusercontent.com/boost-ext/sml/master/example/transitions.cpp" />
-<a href="https://godbolt.org/z/qr8qs78Ts">▶ Run on Compiler Explorer</a>
-<img alt="CPP(BTN)" src="Run_eUML_Emulation_Example|https://raw.githubusercontent.com/boost-ext/sml/master/example/euml_emulation.cpp" />
+<p><a href="https://godbolt.org/z/qr8qs78Ts">▶ Run on Compiler Explorer</a>
 <a href="https://godbolt.org/z/n93Y5Mner">▶ Run on Compiler Explorer</a></p>
 <p>&nbsp;</p>
 <hr />
@@ -391,9 +385,7 @@ make_transition_table(
   &quot;dst_state2&quot;_s + event&lt;game_over&gt; = X
 );
 </code></pre>
-<p><img alt="CPP(BTN)" src="Run_Orthogonal_Regions_Example|https://raw.githubusercontent.com/boost-ext/sml/master/example/orthogonal_regions.cpp" />
-<a href="https://godbolt.org/z/vqGbsrqM3">▶ Run on Compiler Explorer</a>
-<img alt="CPP(BTN)" src="Run_History_Example|https://raw.githubusercontent.com/boost-ext/sml/master/example/history.cpp" />
+<p><a href="https://godbolt.org/z/vqGbsrqM3">▶ Run on Compiler Explorer</a>
 <a href="https://godbolt.org/z/Pvz6Y7vd4">▶ Run on Compiler Explorer</a></p>
 <p>&nbsp;</p>
 <hr />
@@ -441,9 +433,7 @@ For example, we can use <a href="https://github.com/boost-ext/di">ext Boost.DI</
 auto sm = injector.create&lt;sm&lt;example&gt;&gt;();
 sm.process_event(e1{});
 </code></pre>
-<p><img alt="CPP(BTN)" src="Run_Hello_World_Example|https://raw.githubusercontent.com/boost-ext/sml/master/example/hello_world.cpp" />
-<a href="https://godbolt.org/z/dq85hW4ab">▶ Run on Compiler Explorer</a>
-<img alt="CPP(BTN)" src="Run_Dependency_Injection_Example|https://raw.githubusercontent.com/boost-ext/sml/master/example/dependency_injection.cpp" />
+<p><a href="https://godbolt.org/z/dq85hW4ab">▶ Run on Compiler Explorer</a>
 <a href="https://godbolt.org/z/1Pv6EaG7n">▶ Run on Compiler Explorer</a></p>
 <p>&nbsp;</p>
 <hr />
@@ -492,11 +482,8 @@ auto dispatch_event = sml::utility::make_dispatch_table&lt;SDL_Event, SDL_FIRSTE
 SDL_Event event{SDL_QUIT};
 dispatch_event(event, event.type); // will call sm.process(game_over{});
 </code></pre>
-<p><img alt="CPP(BTN)" src="Run_Hello_World_Example|https://raw.githubusercontent.com/boost-ext/sml/master/example/hello_world.cpp" />
-<a href="https://godbolt.org/z/dq85hW4ab">▶ Run on Compiler Explorer</a>
-<img alt="CPP(BTN)" src="Run_Dispatch_Table_Example|https://raw.githubusercontent.com/boost-ext/sml/master/example/dispatch_table.cpp" />
+<p><a href="https://godbolt.org/z/dq85hW4ab">▶ Run on Compiler Explorer</a>
 <a href="https://godbolt.org/z/j5bMnobY9">▶ Run on Compiler Explorer</a>
-<img alt="CPP(BTN)" src="Run_SDL2_Integration_Example|https://raw.githubusercontent.com/boost-ext/sml/master/example/sdl2.cpp" />
 <a href="https://godbolt.org/z/8heY58eE6">▶ Run on Compiler Explorer</a></p>
 <p>&nbsp;</p>
 <hr />
@@ -543,8 +530,7 @@ Please, notice that when there is no exception handler defined in the Transition
 , &quot;error_handler&quot;_s + exception&lt;&gt; / [] { cleanup...; } = X // any exception
 );
 </code></pre>
-<p><img alt="CPP(BTN)" src="Run_Error_Handling_Example|https://raw.githubusercontent.com/boost-ext/sml/master/example/error_handling.cpp" />
-<a href="https://godbolt.org/z/cGd7TnM1G">▶ Run on Compiler Explorer</a></p>
+<p><a href="https://godbolt.org/z/cGd7TnM1G">▶ Run on Compiler Explorer</a></p>
 <p>&nbsp;</p>
 <hr />
 <h3 id="9-test-it">9. Test it</h3>
@@ -567,8 +553,7 @@ sm.set_current_states(&quot;s3&quot;_s); // set_current_states(&quot;s3&quot;_s,
 sm.process_event(event{});
 assert(sm.is(X));
 </code></pre>
-<p><img alt="CPP(BTN)" src="Run_Testing_Example|https://raw.githubusercontent.com/boost-ext/sml/master/example/testing.cpp" />
-<a href="https://godbolt.org/z/oc73h5sY8">▶ Run on Compiler Explorer</a></p>
+<p><a href="https://godbolt.org/z/oc73h5sY8">▶ Run on Compiler Explorer</a></p>
 <p>&nbsp;</p>
 <hr />
 <h3 id="10-debug-it">10. Debug it</h3>
@@ -602,9 +587,7 @@ my_logger logger;
 sml::sm&lt;logging, sml::logger&lt;my_logger&gt;&gt; sm{logger};
 sm.process_event(my_event{}); // will call logger appropriately
 </code></pre>
-<p><img alt="CPP(BTN)" src="Run_Logging_Example|https://raw.githubusercontent.com/boost-ext/sml/master/example/logging.cpp" />
-<a href="https://godbolt.org/z/Tec7jz36r">▶ Run on Compiler Explorer</a>
-<img alt="CPP(BTN)" src="Run_Plant_UML_Example|https://raw.githubusercontent.com/boost-ext/sml/master/example/plant_uml.cpp" />
+<p><a href="https://godbolt.org/z/Tec7jz36r">▶ Run on Compiler Explorer</a>
 <a href="https://godbolt.org/z/8eT6aWsc9">▶ Run on Compiler Explorer</a></p>
 <p>&nbsp;</p>
 <hr />

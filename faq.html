@@ -177,6 +177,38 @@ class types — so SML's action-sequencing is bypassed. Wrap the actions with
 <pre><code class="language-cpp">*&quot;s1&quot;_s + event&lt;e&gt; / (wrap(&amp;A::f), wrap(&amp;A::g)) = X
 </code></pre>
 <p>See <code>example/actions_guards.cpp</code> for a worked example.</p>
+<h2 id="frequently-asked-questions">Frequently asked questions</h2>
+<h3 id="how-do-i-get-inspect-the-current-states">How do I get / inspect the current state(s)?</h3>
+<p>Use <code>sm.is(...)</code> to test the active state, or <code>sm.visit_current_states(...)</code> to
+iterate them. <code>state.c_str()</code> gives the state name:</p>
+<pre><code class="language-cpp">assert(sm.is(&quot;idle&quot;_s));
+sm.visit_current_states([](auto state) { std::cout &lt;&lt; state.c_str() &lt;&lt; '\n'; });
+</code></pre>
+<h3 id="how-do-i-check-whether-the-machine-is-in-one-of-several-states">How do I check whether the machine is in one of several states?</h3>
+<p><code>is(...)</code> accepts one state per orthogonal region, so all regions are tested in a
+single call (no need to release a held mutex between checks):</p>
+<pre><code class="language-cpp">sm.is(s1, s2);  // region 0 == s1 AND region 1 == s2
+</code></pre>
+<h3 id="how-do-i-know-whether-an-event-was-handled-can-i-pass-an-event-instance">How do I know whether an event was handled? Can I pass an event instance?</h3>
+<p><code>process_event</code> returns <code>bool</code> — <code>true</code> when the event was handled, <code>false</code>
+otherwise (an unhandled event triggers <code>unexpected_event&lt;E&gt;</code>). You can pass either a
+type or an instance:</p>
+<pre><code class="language-cpp">const bool handled = sm.process_event(my_event{42});
+</code></pre>
+<h3 id="how-do-i-dispatch-events-from-another-thread-or-an-async-handler">How do I dispatch events from another thread or an async handler?</h3>
+<p>Configure the machine with a <code>process_queue</code> / <code>defer_queue</code> policy and call
+<code>sm.flush_queue()</code> to drain events that were pushed after <code>process_event</code> returned
+(for example from an asynchronous callback). <code>flush_queue()</code> is a no-op when empty.</p>
+<h3 id="how-do-i-discard-deferred-events">How do I discard deferred events?</h3>
+<p>Use the <code>sml::clear_defer</code> action in a transition to drop events that were deferred
+earlier.</p>
+<h3 id="is-sml-part-of-boost">Is SML part of Boost?</h3>
+<p><code>[Boost].SML</code> is a standalone, single-header library with <strong>no dependencies</strong> —
+neither STL nor Boost are required. It is part of the <code>boost-ext</code> project; it is not
+(currently) an official Boost library, and you do not need Boost to use it.</p>
+<h3 id="is-sml-a-moore-or-a-mealy-state-machine">Is SML a Moore or a Mealy state machine?</h3>
+<p>Both. Transition actions run on transitions (Mealy), while <code>on_entry&lt;...&gt;</code> /
+<code>on_exit&lt;...&gt;</code> provide per-state actions (Moore).</p>
               
             </div>
           </div>
